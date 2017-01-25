@@ -32,7 +32,11 @@ vendor/
 # Mac OSX
 .DS_Store
 
-# IDE
+# VSCode
 .vscode
+
+#Intellij
+.idea/
+*.iml
 
 # project binary file
