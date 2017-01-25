@@ -1,8 +1,8 @@
 package main
 
 import (
-	"sync"
-	"log"
+    "sync"
+    "fmt"
 )
 
 func main() {
@@ -11,11 +11,11 @@ func main() {
     for i := 0; i < 5; i++ {
         wg.Add(1)
         go func(wg *sync.WaitGroup, i int) {
-            log.Printf("i:%d", i)
+            fmt.Printf("i:%d", i)
             wg.Done()
         }(wg, i)
     }
 
     wg.Wait()
-    log.Println("exit")
+    fmt.Println("exit")
 }
