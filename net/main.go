@@ -1,7 +1,10 @@
-package net
+package main
 
-import "net"
-import "errors"
+import (
+    "errors"
+    "fmt"
+    "net"
+)
 
 func GetLanIP() (string, error) {
     addrs, err := net.InterfaceAddrs()
@@ -18,4 +21,13 @@ func GetLanIP() (string, error) {
     }
 
     return "", errors.New("not found lan ip")
+}
+
+func main() {
+    ip, err := GetLanIP()
+    if err != nil {
+        fmt.Println(err)
+    } else {
+        fmt.Println(ip)
+    }
 }
