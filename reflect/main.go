@@ -45,5 +45,5 @@ type My struct {
 func main() {
     my := &My{}
     resolve(my)
-    fmt.Printf("%#v", my)
+    fmt.Printf("%#v", my)  // &main.My{Firstname:"John", Lastname:"Doe", Age:42, Nicknames:[]string{"foo", "bar", "ping", "pong"}}
 }
