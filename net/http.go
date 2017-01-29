@@ -1,8 +1,10 @@
 package main
 
 import (
+    "bytes"
     "encoding/json"
     "encoding/xml"
+    "html/template"
     "net/http"
     "path"
     "runtime"
@@ -50,6 +52,63 @@ func sendingFile(w http.ResponseWriter, r *http.Request) {
     _, filename, _, _ := runtime.Caller(0)
     fp := path.Join(path.Dir(filename), "images", "foo.jpg")
     http.ServeFile(w, r, fp)
+}
+
+func renderingTemplate(w http.ResponseWriter, r *http.Request) {
+    profile := Profile{"Alex", []string{"snowboarding", "programming"}}
+
+    _, filename, _, _ := runtime.Caller(0)
+    fp := path.Join(path.Dir(filename), "template", "index.html")
+
+    tmpl, err := template.ParseFiles(fp)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    if err := tmpl.Execute(w, profile); err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
+}
+
+func renderingTemplateToString(w http.ResponseWriter, r *http.Request) {
+    profile := Profile{"Alex", []string{"snowboarding", "programming"}}
+
+    _, filename, _, _ := runtime.Caller(0)
+    fp := path.Join(path.Dir(filename), "template", "index.html")
+
+    tmpl, err := template.ParseFiles(fp)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    buf := new(bytes.Buffer)
+    if err := tmpl.Execute(buf, profile); err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    templateString := buf.String()
+    w.Write([]byte(templateString))
+}
+
+func renderingNestedTemplate(w http.ResponseWriter, r *http.Request) {
+    profile := Profile{"Alex", []string{"snowboarding", "programming"}}
+
+    _, filename, _, _ := runtime.Caller(0)
+    lp := path.Join(path.Dir(filename), "template", "layout.html")
+    fp := path.Join(path.Dir(filename), "template", "hello.html")
+
+    tmpl, err := template.ParseFiles(lp, fp)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    if err := tmpl.Execute(w, profile); err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
 }
 
 func main() {
@@ -106,6 +165,48 @@ func main() {
     // Content-Type: image/jpeg
     // Last-Modified: Sun, 29 Jan 2017 08:27:31 GMT
     // Date: Sun, 29 Jan 2017 08:49:51 GMT
+
+
+    http.HandleFunc("/rendering_template", renderingTemplate)
+    // $ curl -i localhost:3000/rendering_template
+    // HTTP/1.1 200 OK
+    // Date: Sun, 29 Jan 2017 10:31:46 GMT
+    // Content-Length: 41
+    // Content-Type: text/html; charset=utf-8
+    //
+    // <h1>Hello Alex</h1>
+    // <p>I'm index.html</p>
+
+
+    http.HandleFunc("/rendering_template_to_string", renderingTemplateToString)
+    // $ curl -i localhost:3000/rendering_template_to_string
+    // HTTP/1.1 200 OK
+    // Date: Sun, 29 Jan 2017 10:42:37 GMT
+    // Content-Length: 41
+    // Content-Type: text/html; charset=utf-8
+    //
+    // <h1>Hello Alex</h1>
+    // <p>I'm index.html</p>
+
+
+    http.HandleFunc("/rendering_nested_template", renderingNestedTemplate)
+    // $ curl -i localhost:3000/rendering_nested_template
+    // HTTP/1.1 200 OK
+    // Date: Sun, 29 Jan 2017 11:04:14 GMT
+    // Content-Length: 154
+    // Content-Type: text/html; charset=utf-8
+    //
+    // <html>
+    //     <head>
+    //         <title>An example layout</title>
+    //     </head>
+    //     <body>
+    //
+    // <h1>Hello Alex</h1>
+    // <p>I'm hello.html</p>
+    //
+    //     </body>
+    // </html>
 
 
     http.ListenAndServe(":3000", nil)
