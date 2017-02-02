@@ -6,7 +6,7 @@ import (
     "net/http"
 )
 
-func GetResponse(url string) (string, error) {
+func getHTTPResponse(url string) (string, error) {
     response, err := http.Get(url)
     if err != nil {
         return "", err
@@ -17,7 +17,7 @@ func GetResponse(url string) (string, error) {
 }
 
 func main() {
-    content, _ := GetResponse("http://httpbin.org/user-agent")
+    content, _ := getHTTPResponse("http://httpbin.org/user-agent")
     fmt.Println(content)
 
     // {

@@ -6,7 +6,7 @@ import (
     "net"
 )
 
-func GetLanIP() (string, error) {
+func getLanIP() (string, error) {
     addrs, err := net.InterfaceAddrs()
     if err != nil {
         return "", err
@@ -24,7 +24,7 @@ func GetLanIP() (string, error) {
 }
 
 func main() {
-    ip, err := GetLanIP()
+    ip, err := getLanIP()
     if err != nil {
         fmt.Println(err)
     } else {
